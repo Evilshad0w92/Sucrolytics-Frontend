@@ -18,7 +18,7 @@ export async function renderDashboard() {
           <button class="topbar-link" id="link-datos">Ingreso de Datos</button>
           <button class="topbar-link" id="link-cordia">Cordia</button>
           ${esAdmin ? '<button class="topbar-link" id="link-usuarios">Usuarios</button>' : ''}
-          <button class="topbar-link" id="btn-cambiar-pwd">Mi contraseña</button>
+          <button class="topbar-link" id="btn-cambiar-pwd">Cambiar contraseña</button>
           <div class="topbar-divider"></div>
           <span class="topbar-name">${user?.name ?? ''}</span>
           <span class="topbar-role">${user?.role ?? ''}</span>

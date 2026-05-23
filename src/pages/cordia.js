@@ -169,23 +169,115 @@ function fila(label, dia, fecha = null, bold = false, sep = false) {
 
 function renderTabla(d, fecha) {
 
-  // ── Balance de POL (full width) ────────────────────────────────────────────
+  // ── Balance de POL (full width, 4 secciones de columnas) ─────────────────
   const i3js = v => (v != null ? Math.round(v * 1000) : null)
   const totDia = (i3js(d.pol_en_cana_dia) != null && i3js(d.azucar_pye_dia) != null)
     ? (i3js(d.pol_en_cana_dia) - i3js(d.azucar_pye_dia)) / 1000 : null
   const totFecha = (i3js(d.pol_en_cana_fecha) != null && i3js(d.az_sac_fecha_pe) != null)
     ? (i3js(d.pol_en_cana_fecha) - i3js(d.az_sac_fecha_pe)) / 1000 : null
 
-  const filasBalance =
-    fila('Pérdida Bagazo',           fmt3(d.perdida_bagazo_dia),         fmt3(d.perdida_bagazo_fecha)) +
-    fila('Pérdida Miel Final P Y E', fmt3(d.perdida_miel_dia),           fmt3(d.mf_sac_fecha_pe)) +
-    fila('Pérdida Cachaza',          fmt3(d.perdida_indet_dia_pe),       fmt3(d.perdida_indet_fecha_pe)) +
-    fila('Pérdida Indeterminada',    fmt(d.perdida_indet_dia),           fmt(d.perdida_indet_fecha)) +
-    fila('Pérdidas Totales',         fmt3(totDia),                       fmt3(totFecha),         true, true) +
-    fila('Azúcar P Y E',            fmt3(d.azucar_pye_dia),             fmt3(d.az_sac_fecha_pe)) +
-    fila('POL en Caña',             fmt3(d.pol_en_cana_dia),            fmt3(d.pol_en_cana_fecha), true)
+  const jmD = d.jm_sac_dia,       jmF = d.jm_sac_fecha
+  const polD = d.pol_en_cana_dia,  polF = d.pol_en_cana_fecha
+  const canaD = d.cana_molida_dia, canaF = d.cana_tons_fecha
 
-  const balanceCard = card('Balance de POL', tabla(filasBalance), '#dc2626')
+  // Pre-redondea a 3dp para evitar errores de punto flotante en el límite de redondeo
+  const pp = (num, den) =>
+    (num != null && den != null && den !== 0) ? Math.round(num / den * 100 * 1000) / 1000 : null
+  const fp2 = v =>
+    v != null ? Number(v).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : dash()
+  const fp3 = v =>
+    v != null ? Number(v).toLocaleString('es-MX', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) : dash()
+
+  // Totales %JM excluye bagazo (bagazo no aplica vs JM)
+  const totSinBazD = (d.perdida_miel_dia != null && d.perdida_cachaza_dia != null && d.perdida_indet_dia_pe != null)
+    ? d.perdida_miel_dia + d.perdida_cachaza_dia + d.perdida_indet_dia_pe : null
+  const totSinBazF = (d.mf_sac_fecha_pe != null && d.cach_sac_fecha != null && d.perdida_indet_fecha_pe != null)
+    ? d.mf_sac_fecha_pe + d.cach_sac_fecha + d.perdida_indet_fecha_pe : null
+
+  const bRows = [
+    { label: 'Pérdida Bagazo',           bold: false, sep: false,
+      n: d.perdida_bagazo_dia,    o: d.perdida_bagazo_fecha,
+      p: null,                     q: null,
+      r: pp(d.perdida_bagazo_dia, polD),  s: pp(d.perdida_bagazo_fecha, polF),
+      t: pp(d.perdida_bagazo_dia, canaD), u: pp(d.perdida_bagazo_fecha, canaF) },
+    { label: 'Pérdida Miel Final P Y E', bold: false, sep: false,
+      n: d.perdida_miel_dia,      o: d.mf_sac_fecha_pe,
+      p: pp(d.perdida_miel_dia, jmD),    q: pp(d.mf_sac_fecha_pe, jmF),
+      r: pp(d.perdida_miel_dia, polD),   s: pp(d.mf_sac_fecha_pe, polF),
+      t: pp(d.perdida_miel_dia, canaD),  u: pp(d.mf_sac_fecha_pe, canaF) },
+    { label: 'Pérdida Cachaza',          bold: false, sep: false,
+      n: d.perdida_cachaza_dia,   o: d.cach_sac_fecha,
+      p: pp(d.perdida_cachaza_dia, jmD),  q: pp(d.cach_sac_fecha, jmF),
+      r: pp(d.perdida_cachaza_dia, polD), s: pp(d.cach_sac_fecha, polF),
+      t: pp(d.perdida_cachaza_dia, canaD), u: pp(d.cach_sac_fecha, canaF) },
+    { label: 'Pérdida Indeterminada',    bold: false, sep: false,
+      n: d.perdida_indet_dia_pe,  o: d.perdida_indet_fecha_pe,
+      p: pp(d.perdida_indet_dia_pe, jmD),  q: pp(d.perdida_indet_fecha_pe, jmF),
+      r: pp(d.perdida_indet_dia_pe, polD), s: pp(d.perdida_indet_fecha_pe, polF),
+      t: pp(d.perdida_indet_dia_pe, canaD), u: pp(d.perdida_indet_fecha_pe, canaF) },
+    { label: 'Pérdidas Totales',         bold: true,  sep: true,
+      n: totDia,                  o: totFecha,
+      p: pp(totSinBazD, jmD),    q: pp(totSinBazF, jmF),
+      r: pp(totDia, polD),        s: pp(totFecha, polF),
+      t: pp(totDia, canaD),       u: pp(totFecha, canaF) },
+    { label: 'Azúcar P Y E',            bold: false, sep: false,
+      n: d.azucar_pye_dia,        o: d.az_sac_fecha_pe,
+      p: pp(d.azucar_pye_dia, jmD),   q: pp(d.az_sac_fecha_pe, jmF),
+      r: pp(d.azucar_pye_dia, polD),  s: pp(d.az_sac_fecha_pe, polF),
+      t: pp(d.azucar_pye_dia, canaD), u: pp(d.az_sac_fecha_pe, canaF) },
+    { label: 'POL en Caña',             bold: true,  sep: false,
+      n: polD,                    o: polF,
+      p: pp(jmD, jmD),            q: pp(jmF, jmF),
+      r: pp(polD, polD),          s: pp(polF, polF),
+      t: pp(polD, canaD),         u: pp(polF, canaF) },
+  ]
+
+  const thB = (txt, col) =>
+    `<th style="text-align:right;padding:3px 7px;font-size:10px;font-weight:600;
+                text-transform:uppercase;letter-spacing:.4px;color:${col}">${txt}</th>`
+  const thG = (txt, cols, col) =>
+    `<th colspan="${cols}" style="text-align:center;padding:4px 7px;font-size:10px;
+                font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+                color:${col};border-bottom:2px solid ${col}">${txt}</th>`
+
+  const balanceFilas = bRows.map(row => {
+    const s  = row.sep  ? 'border-top:2px solid #e5e7eb;' : ''
+    const tw = row.bold ? 'font-weight:700;color:#111827' : 'color:#374151'
+    const nw = row.bold ? 'font-weight:700;color:#111827' : 'color:#1f2937'
+    const td = (v, f) =>
+      `<td style="text-align:right;padding:3px 7px;font-size:11.5px;font-variant-numeric:tabular-nums;${nw}">${f(v)}</td>`
+    return `<tr style="${s}border-bottom:1px solid #f9fafb">
+      <td style="padding:3px 7px;font-size:11.5px;white-space:nowrap;${tw}">${row.label}</td>
+      ${td(row.n, fmt3)}${td(row.o, fmt3)}
+      ${td(row.p, fp2)}${td(row.q, fp2)}
+      ${td(row.r, fp2)}${td(row.s, fp2)}
+      ${td(row.t, fp3)}${td(row.u, fp3)}
+    </tr>`
+  }).join('')
+
+  const balanceCard = card('Balance de POL', `
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:700px">
+        <thead>
+          <tr>
+            <th style="padding:3px 7px"></th>
+            ${thG('TONELADAS', 2, '#1e40af')}
+            ${thG('%POL JUGO MEZCLADO', 2, '#0891b2')}
+            ${thG('POL % CAÑA', 2, '#7c3aed')}
+            ${thG('% CAÑA', 2, '#065f46')}
+          </tr>
+          <tr style="border-bottom:1px solid #e5e7eb">
+            <th style="padding:3px 7px"></th>
+            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+          </tr>
+        </thead>
+        <tbody>${balanceFilas}</tbody>
+      </table>
+    </div>
+  `, '#dc2626')
 
   // ── JM ───────────────────────────────────────────────────────────────────
   const jmCard = card('Jugo Mezclado', tabla(
@@ -238,7 +330,7 @@ function renderTabla(d, fecha) {
   )
 
   // ── Azúcar Total ──────────────────────────────────────────────────────────
-  const azTotalCard = card('Azúcar Total — Sacarosa Aparente', tabla(
+  const azTotalCard = card('Azúcar Total', tabla(
     fila('Sacarosa Aparente (TONS)', fmt(d.az_sac_dia), fmt(d.az_sac_fecha), true)
   ), '#15803d')
 
@@ -285,11 +377,10 @@ function renderTabla(d, fecha) {
   return `
     <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px">
       ${balanceCard}
-      ${canaCard}
+      ${grid2(canaCard, azTotalCard)}
       ${grid2(jmCard, bagazoCard)}
       ${grid2(mielCard, cachazaCard)}
       ${grid2(procesoCard, producidoCard)}
-      ${azTotalCard}
       ${azucarCard}
       ${prodEstCard}
     </div>
