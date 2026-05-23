@@ -19,11 +19,13 @@
  * @returns {{ access_token, user }} en caso exitoso
  * @throws {Error} con mensaje legible para el usuario
  */
+import { BASE_URL } from '../api/client.js'
+
 async function apiLogin(usuario, password) {
   // Si el servidor no responde, fetch lanza TypeError
   let res
   try {
-    res = await fetch('/api/auth/login', {
+    res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuario, password }),

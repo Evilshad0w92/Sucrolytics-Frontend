@@ -7,8 +7,14 @@
 
 import { getToken, cerrarSesion } from '../router.js'
 
+// Local development
+// export const BASE_URL = 'http://localhost:8000'
+
+// Production — Render
+export const BASE_URL = 'https://sucrolytics-backend.onrender.com'
+
 export async function apiFetch(url, options = {}) {
-  const res = await fetch(url, {
+  const res = await fetch(`${BASE_URL}${url}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
