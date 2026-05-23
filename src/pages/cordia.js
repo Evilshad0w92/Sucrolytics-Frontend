@@ -30,20 +30,19 @@ export async function renderCordia() {
 
       <main class="page-main" style="max-width:1040px">
 
-        <div class="ingreso-controles">
-          <div class="form-group">
+        <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+          <div style="flex:0 0 auto">
             <label class="form-label">Fecha</label>
-            <input class="form-input" type="date" id="sel-fecha" />
+            <input class="form-input" type="date" id="sel-fecha" style="margin-bottom:0;width:180px" />
           </div>
-          <div class="form-group">
+          <div style="flex:0 0 auto">
             <label class="form-label">Zafra</label>
-            <select class="form-input" id="sel-zafra">
-              <option value="">Cargando zafras…</option>
+            <select class="form-input" id="sel-zafra" style="margin-bottom:0;width:200px">
+              <option value="">Cargando…</option>
             </select>
           </div>
-          <div class="form-group" style="align-self:flex-end;display:flex;gap:8px">
-            <button class="btn-secondary" id="btn-ultimo-dia" style="padding:10px 16px">Último día</button>
-            <button class="btn-primary"   id="btn-calcular"   style="padding:10px 24px">Calcular</button>
+          <div style="flex:0 0 auto">
+            <button class="btn-primary" id="btn-calcular" style="padding:10px 20px;white-space:nowrap">Refrescar</button>
           </div>
         </div>
 
@@ -55,7 +54,6 @@ export async function renderCordia() {
 
   document.getElementById('btn-back').addEventListener('click', () => navegarA('dashboard'))
   document.getElementById('btn-calcular').addEventListener('click', calcular)
-  document.getElementById('btn-ultimo-dia').addEventListener('click', irUltimoDia)
 
   const hoy = new Date().toISOString().slice(0, 10)
   document.getElementById('sel-fecha').value = hoy
@@ -257,29 +255,35 @@ function renderTabla(d, fecha) {
     </tr>`
   }).join('')
 
-  const balanceCard = card('Balance de POL', `
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;min-width:700px">
-        <thead>
-          <tr>
-            <th style="padding:3px 7px"></th>
-            ${thG('TONELADAS', 2, '#1e40af')}
-            ${thG('%POL JUGO MEZCLADO', 2, '#0891b2')}
-            ${thG('POL % CAÑA', 2, '#7c3aed')}
-            ${thG('% CAÑA', 2, '#065f46')}
-          </tr>
-          <tr style="border-bottom:1px solid #e5e7eb">
-            <th style="padding:3px 7px"></th>
-            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
-            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
-            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
-            ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
-          </tr>
-        </thead>
-        <tbody>${balanceFilas}</tbody>
-      </table>
-    </div>
-  `, '#dc2626')
+  const balanceCard = `
+    <div style="background:#fff;border:1px solid #e5e7eb;border-top:3px solid #dc2626;
+                border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden">
+      <div style="padding:14px 16px 10px">
+        <div style="font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+                    color:#dc2626">Balance de POL</div>
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table style="border-collapse:collapse;min-width:680px;width:100%">
+          <thead>
+            <tr>
+              <th style="padding:3px 7px"></th>
+              ${thG('TONELADAS', 2, '#1e40af')}
+              ${thG('%POL JUGO MEZCLADO', 2, '#0891b2')}
+              ${thG('POL % CAÑA', 2, '#7c3aed')}
+              ${thG('% CAÑA', 2, '#065f46')}
+            </tr>
+            <tr style="border-bottom:1px solid #e5e7eb">
+              <th style="padding:3px 7px"></th>
+              ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+              ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+              ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+              ${thB('DIA','#1e40af')}${thB('FECHA','#065f46')}
+            </tr>
+          </thead>
+          <tbody>${balanceFilas}</tbody>
+        </table>
+      </div>
+    </div>`
 
   // ── JM ───────────────────────────────────────────────────────────────────
   const jmCard = card('Jugo Mezclado', tabla(
@@ -374,7 +378,7 @@ function renderTabla(d, fecha) {
 
   // ── Layout ────────────────────────────────────────────────────────────────
   const grid2 = (...cards) =>
-    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">${cards.join('')}</div>`
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">${cards.join('')}</div>`
 
   return `
     <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px">
