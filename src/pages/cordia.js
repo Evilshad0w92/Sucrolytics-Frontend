@@ -134,8 +134,8 @@ function card(titulo, contenido, accent = '#6b7280') {
 
 function tabla(filas, conFecha = true) {
   const colFecha = conFecha
-    ? `<th style="text-align:right;padding-bottom:7px;font-size:11px;font-weight:600;
-                  text-transform:uppercase;letter-spacing:.4px;color:#065f46">FECHA</th>`
+    ? `<th style="text-align:right;padding:0 0 7px 12px;font-size:11px;font-weight:600;
+                  text-transform:uppercase;letter-spacing:.4px;color:#065f46;white-space:nowrap">FECHA</th>`
     : ''
   return `
     <table style="width:100%;border-collapse:collapse">
@@ -143,8 +143,8 @@ function tabla(filas, conFecha = true) {
         <tr style="border-bottom:1px solid #f3f4f6">
           <th style="text-align:left;padding-bottom:7px;font-size:11px;font-weight:600;
                      text-transform:uppercase;letter-spacing:.4px;color:#9ca3af"></th>
-          <th style="text-align:right;padding-bottom:7px;font-size:11px;font-weight:600;
-                     text-transform:uppercase;letter-spacing:.4px;color:#1e40af">DIA</th>
+          <th style="text-align:right;padding:0 0 7px 12px;font-size:11px;font-weight:600;
+                     text-transform:uppercase;letter-spacing:.4px;color:#1e40af;white-space:nowrap">DIA</th>
           ${colFecha}
         </tr>
       </thead>
@@ -157,12 +157,14 @@ function fila(label, dia, fecha = null, bold = false, sep = false) {
   const txtStyle = bold ? 'font-weight:700;color:#111827' : 'color:#374151'
   const numStyle = bold ? 'font-weight:700;color:#111827' : 'color:#1f2937'
   const f = fecha !== null
-    ? `<td style="text-align:right;padding:5px 0;font-size:12.5px;font-variant-numeric:tabular-nums;${numStyle}">${fecha}</td>`
+    ? `<td style="text-align:right;padding:5px 0 5px 12px;font-size:12.5px;
+                  font-variant-numeric:tabular-nums;white-space:nowrap;${numStyle}">${fecha}</td>`
     : ''
   return `
     <tr style="${sepStyle}border-bottom:1px solid #f9fafb">
-      <td style="padding:5px 0;font-size:12.5px;${txtStyle}">${label}</td>
-      <td style="text-align:right;padding:5px 0;font-size:12.5px;font-variant-numeric:tabular-nums;${numStyle}">${dia}</td>
+      <td style="padding:5px 8px 5px 0;font-size:12.5px;${txtStyle}">${label}</td>
+      <td style="text-align:right;padding:5px 0 5px 12px;font-size:12.5px;
+                 font-variant-numeric:tabular-nums;white-space:nowrap;${numStyle}">${dia}</td>
       ${f}
     </tr>`
 }
@@ -372,7 +374,7 @@ function renderTabla(d, fecha) {
 
   // ── Layout ────────────────────────────────────────────────────────────────
   const grid2 = (...cards) =>
-    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">${cards.join('')}</div>`
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">${cards.join('')}</div>`
 
   return `
     <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px">
