@@ -340,10 +340,29 @@ async function guardarInicialFn() {
 
 // ─── Cargar datos existentes ──────────────────────────────────────────────────
 
+function limpiarCampos() {
+  const ids = [
+    'cana_recibida_dia_ton', 'agua_imbibicion_dia_ton',
+    'jugo_mezclado_dia_tons', 'jugo_mezclado_sacarosa',
+    'bagazo_sacarosa_pct', 'miel_final_sacarosa',
+    'miel_final_fisica_tons', 'sacarosa_a_miel_final_tons',
+    'sacarosa_recuperable_tons', 'filtro_banda_pol', 'cachaza_dia_tons',
+    'refinado_tons', 'refinado_pol_pct',
+    'estandar_tons', 'estandar_pol_pct',
+    'crudo_tons', 'crudo_pol_pct',
+  ]
+  ids.forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.value = ''
+  })
+}
+
 async function cargarDatos() {
   const fecha   = document.getElementById('sel-fecha').value
   const zafraId = document.getElementById('sel-zafra').value
   if (!fecha || !zafraId) return
+
+  limpiarCampos()
 
   try {
     const d = await obtenerDia(fecha, zafraId)
